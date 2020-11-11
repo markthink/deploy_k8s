@@ -1,0 +1,16 @@
+---
+- hosts: 
+  - k8s_node
+  remote_user: vagrant
+  become: true
+  tasks:
+  - name: copy script
+    copy: src="prek8s.sh" mode="0744" dest="/home/vagrant/prek8s.sh"
+
+  - name: exec prek8s
+    command: /home/vagrant/prek8s.sh
+
+  - name: reboot machine
+    reboot:
+      reboot_timeout: 600
+      test_command: whoami

@@ -1,0 +1,26 @@
+localPeer:
+  id: master-2
+  address: 192.168.20.155
+  port: 10000
+remotePeers:
+- id: master-1
+  address: 192.168.20.154
+  port: 10000
+- id: master-3
+  address: 192.168.20.156
+  port: 10000
+vip: 192.168.20.150
+gratuitousARP: true
+singleNode: false
+startAsLeader: false
+interface: eth1
+loadBalancers:
+- name: API Server Load Balancer
+  type: tcp
+  port: 6443
+  bindToVip: false
+  backends:
+  - port: 6443
+    address: 192.168.20.154
+  - port: 6443
+    address: 192.168.20.156

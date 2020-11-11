@@ -1,0 +1,16 @@
+[all:vars]
+ansible_port=22
+ansible_user=vagrant
+ansible_ssh_pass=vagrant
+ansible_become_pass=vagrant
+
+
+[k8s_node]
+192.168.20.151
+192.168.20.152
+192.168.20.153
+192.168.20.154
+192.168.20.155
+192.168.20.156
+192.168.20.157
+192.168.20.158
