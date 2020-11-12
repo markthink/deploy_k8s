@@ -102,7 +102,8 @@
       state: restarted
 
   - name: Initialize the Kubernetes cluster using kubeadm
-    command: kubeadm init --apiserver-advertise-address="192.168.50.10" --apiserver-cert-extra-sans="192.168.50.10"  --node-name k8s-master --pod-network-cidr=192.168.0.0/16
+    #--pod-network-cidr 指定的 CIDR 与 Flannel 网段要一致
+    command: kubeadm init --apiserver-advertise-address="192.168.50.10" --apiserver-cert-extra-sans="192.168.50.10"  --node-name k8s-master --pod-network-cidr=10.244.0.0/16
 
   - name: Setup kubeconfig for vagrant user
     command: "{{ item }}"

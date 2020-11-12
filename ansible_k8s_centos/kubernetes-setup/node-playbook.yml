@@ -1,0 +1,43 @@
+---
+- hosts: all
+  become: true
+  # remote_user: vagrant
+  vars:
+    # ansible_become_pass: vagrant
+  tasks:
+  - name: Read prek8s.sh file
+    template:
+      src: prek8s.sh
+      dest: /tmp/prek8s.sh
+
+  - name: Install docker-ce/kubelet/kubeadm/kubectl
+    command: bash /tmp/prek8s.sh
+
+  - name: Accept forward rules
+    command: iptables -P FORWARD ACCEPT
+
+  - name: Accept forward rules
+    command: iptables -P FORWARD ACCEPT
+
+  - name: Configure node ip
+    lineinfile:
+      path: /etc/sysconfig/kubelet
+      line: KUBELET_EXTRA_ARGS=--node-ip={{ node_ip }}
+      create: yes
+
+  - name: Restart kubelet
+    service:
+      name: kubelet
+      daemon_reload: yes
+      state: restarted
+
+  - name: Copy the join command to server location
+    become: false
+    copy: src=join-command dest=/tmp/join-command.sh mode=0777
+
+  - name: Join the node to cluster
+    command: sh /tmp/join-command.sh
+
+  handlers:
+    - name: docker status
+      service: name=docker state=started
