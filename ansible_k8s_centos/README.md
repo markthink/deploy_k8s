@@ -41,8 +41,6 @@ kube-system   kube-proxy-zjzcs                     1/1     Running   0          
 kube-system   kube-scheduler-k8s-master            1/1     Running   0          18m     192.168.50.10   k8s-master   <none>           <none>
 ```
 
-
-
 ```bash
 # 查看 fdb 表项
 bridge fdb show dev flannel.1

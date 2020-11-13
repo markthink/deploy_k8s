@@ -1,0 +1,57 @@
+---
+- hosts: all
+  become: true
+  # remote_user: vagrant
+  vars:
+    # ansible_become_pass: vagrant
+    # iface: eth1
+  tasks:
+  - name: Read prek8s.sh file
+    template:
+      src: prek8s.sh
+      dest: /tmp/prek8s.sh
+
+  - name: Install docker-ce/kubelet/kubeadm/kubectl
+    command: bash /tmp/prek8s.sh
+
+  - name: Accept forward rules
+    command: iptables -P FORWARD ACCEPT
+
+  - name: Configure node ip
+    lineinfile:
+      path: /etc/sysconfig/kubelet
+      line: KUBELET_EXTRA_ARGS=--node-ip={{ node_ip }}
+      create: yes
+  
+  - name: Restart kubelet
+    service:
+      name: kubelet
+      daemon_reload: yes
+      state: restarted
+  
+  # "modprobe: FATAL: Module configs not found
+  - name: copy config
+    command: cp /boot/config-3.10.0-1127.el7.x86_64 /boot/config-5.9.8
+
+  - name: Initialize the Kubernetes cluster using kubeadm
+    command: kubeadm init --apiserver-advertise-address="192.168.50.10" --apiserver-cert-extra-sans="192.168.50.10"  --node-name k8s-master --pod-network-cidr=10.244.0.0/16
+
+  - name: Setup kubeconfig for vagrant user
+    command: "{{ item }}"
+    with_items:
+     - mkdir -p /home/vagrant/.kube
+     - cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
+     - chown vagrant:vagrant /home/vagrant/.kube/config
+
+  - name: Generate join command
+    command: kubeadm token create --print-join-command
+    register: join_command
+
+  - name: Copy join command to local file
+    become: false
+    local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="./join-command"
+
+  handlers:
+    - name: docker status
+      service: name=docker state=started
+
