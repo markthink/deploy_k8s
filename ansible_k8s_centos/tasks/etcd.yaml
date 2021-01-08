@@ -1,0 +1,21 @@
+---
+- hosts:
+  - masters
+  remote_user: vagrant
+  become: true
+  tasks:
+# 1. 性能检测
+# 1.1 etcd 慢日志检测
+  - name: 5.1 etcd 慢日志检测
+    shell: journalctl -u etcd-server |grep 'too long'|wc -l
+    register: etcd_result
+  - name: print etcd_result
+    debug:
+      msg: "{{ etcd_result.stdout_lines }}"
+
+  - name: 5.2 etcd health status
+    shell: ETCDCTL_API=3 etcdctl --cacert /etc/ssl/etcd/ssl/ca.pem --cert /etc/ssl/etcd/ssl/node-master-1.pem --key /etc/ssl/etcd/ssl/node-master-1-key.pem endpoint health --cluster
+    register: health_result
+  - name: print health_result
+    debug:
+      msg: "{{ health_result.stdout_lines }}"

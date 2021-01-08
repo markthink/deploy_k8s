@@ -1,0 +1,12 @@
+[all:vars]
+ansible_port=22
+ansible_user=vagrant
+ansible_ssh_pass=vagrant
+ansible_become_pass=vagrant
+
+[masters]
+k8s-master ansible_ssh_host=192.168.50.10
+
+[nodes]
+node-1 ansible_ssh_host=192.168.50.11
+node-2 ansible_ssh_host=192.168.50.12
